@@ -21,7 +21,7 @@ spacesController.addNamespace = (req, res, next) => {
 spacesController.createNamespace = (req, res, next) => {
   console.log(req.body)
   const { hostNamespace } = req.body;
-  runTerminalCommand(gcloud.getCredentials(hostNamespace))
+  runTerminalCommand(gcloud.getCredentials)
   .then((data) => {
     console.log(data)
     runTerminalCommand(kubectl.createNamespace(hostNamespace))

@@ -21,7 +21,7 @@ clusterController.addCluster = (req, res, next) => {
 clusterController.createCluster = (req, res, next) => {
     console.log(req.body);
     const { clusterName, vClusterName, hostNamespace } = req.body;
-    runTerminalCommand(gcloud.getCredentials(hostNamespace))
+    runTerminalCommand(gcloud.getCredentials)
     .then((data) => {
       console.log('1',data)
       runTerminalCommand(vCluster.create(vClusterName, hostNamespace))
