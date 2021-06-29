@@ -3,27 +3,10 @@ const { runTerminalCommand, kubectl, gcloud } = require('../../terminalCommands.
 const { reset } = require('nodemon');
 const spacesController = {};
 
-
-spacesController.addNamespace = (req, res, next) => {
-  const { clusterName, team_id, projectName } = req.body;
-  const params = [clusterName, team_id, projectName];
-  const query = `
-  INSERT INTO namespaces2(cluster_id, name, team_id, project)
-  VALUES ($1, $2, $3, $4)`
-
-  db.query(query, params)
-    .then(() => {
-      return next();
-    })
-    .catch((err) => {
-      return next({ log: `Error in spacesController.addNamespace: ${err}` });
-    })
-}
-
 spacesController.clusterIdLookup = (req, res, next) => {
   const { hostCluster } = req.body;
   const params = [hostCluster];
-  const query = `SELECT _id FROM clusters WHERE name='$1'`;
+  const query = `SELECT _id FROM clusters WHERE name=$1`;
   db.query(query, params)
     .then((data) => {
       console.log(data.rows[0]._id);
@@ -44,7 +27,6 @@ spacesController.addNamespace = (req, res, next) => {
   const params = [hostNamespace, clusterId];
   // if the team ID is a foreign key, do we need to add this in or is it automatic?
   const query = 'INSERT INTO namespaces (name, cluster_id) VALUES ($1, $2)';
-
   db.query(query, params)
     .then((data) => {
       console.log(data)
@@ -52,7 +34,7 @@ spacesController.addNamespace = (req, res, next) => {
     })
     .catch((err) => {
       return next({ log: `Error in spacesController.addNamespace: ${err}` });
-    })
+  })
 }
 
 spacesController.createNamespace = (req, res, next) => {

@@ -13,7 +13,7 @@ const CreateUser = () => {
     e.preventDefault();
     fetch('/user/create', {
       method:"POST",
-      header: {
+      headers: {
         "Content-Type":"application/json"
     },
       body: JSON.stringify({email})
