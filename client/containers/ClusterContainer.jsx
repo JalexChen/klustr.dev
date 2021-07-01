@@ -96,7 +96,6 @@ const ClusterContainer = () => {
           minWidth="80%"
           alignSelf="center"
           marginLeft="-2rem"
-          
           >
             &nbsp;&nbsp;
             {circle}

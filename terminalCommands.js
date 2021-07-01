@@ -12,27 +12,6 @@ const runTerminalCommand = (command) => {
   })
 }
 
-// can delete this
-// // gcloud variables
-// let clusterName = 'klustr-jefftest';
-// let gcloudRegion = 'us-west1';
-// let numNodes = '2';
-// let gcloudUserEmail = 'contact.jeffchen@gmail.com';
-// // kubctl variables
-// let imageFile = 'docker.io/klustr/watchr'
-// // imageFile only for watchr purposes
-// let deploymentName = 'klustr-deployment'
-// // changed to hostNameSpace instead of namespace
-// let hostNamespace = 'kiosk';
-// let configFile = '/yamlConfigs/account.yaml';
-// let userConfigFile = '/yamlConfigs/userAccount.yaml';
-// let podName = 'klustr-deployment-786bd87dd4-pvrk6';
-// let userName = 'john';
-// let portIn = '80';
-// let portOut = '8080';
-// let space = 'johns-space';
-// let vClusterName = 'testing';
-
 // gcloud terminal commands
 const gcloud = {}
 // necessary to create a cluster if it doesn't already exist; be aware of regional resource availability
@@ -61,6 +40,8 @@ kubectl.expose = (deploymentName, hostNamespace) => `kubectl expose deployment $
 kubectl.deploy = (hostNamespace, configFile) => `kubectl apply -n ${hostNamespace} -f /Users/fenris/Desktop/Codesmith/klustr.dev/yamlConfigs/${configFile}.yaml`
 // deploy the pod in a specific namespace with the image configuration impersonating a user; admin only
 kubectl.deployAs = (hostNamespace, configFile, userName) => `kubectl apply -n ${hostNamespace} -f /yamlConfigs/${configFile}.yaml --as=${userName}`
+// grabs the external exposed IP address
+kubectl.exposedIP = (deploymentName, deployedNamespace) => `kubectl get services ${deploymentName} -n ${deployedNamespace} -o jsonpath="{.status.loadBalancer.ingress[0].ip}"`
 
 const vCluster = {}
 
@@ -68,30 +49,6 @@ vCluster.create = (vClusterName, hostNamespace) => `vcluster create ${vClusterNa
 vCluster.connect = (vClusterName, hostNamespace) => `vcluster connect ${vClusterName} -n ${hostNamespace} \export KUBECONFIG=./kubeconfig.yaml`;
 vCluster.delete = (vClusterName, hostNamespace) => `vcluster delete ${vClusterName} -n ${hostNamespace}`;
 
-
-
-// can delete this
-// const serviceAccount = {}
-// serviceAccount.user = (email) => `USER_NAME="${email}" \ kubectl -n kiosk create serviceaccount "${email}"`
-
-//fs write file?
-
-// serviceAccount.userConfig = (email) => { 
-// `USER_NAME="${email}" KUBECONFIG_PATH="$HOME/.kube/config-kiosk" && 
-// kubectl config view --minify --raw > "$HOME/.kube/config-kiosk" &&
-// export KUBECONFIG="$HOME/.kube/config-kiosk"`
-// CURRENT_CONTEXT=$(kubectl config current-context) \
-// kubectl config rename-context $CURRENT_CONTEXT kiosk-admin \
-// CLUSTER_NAME=$(kubectl config view -o jsonpath="{.clusters[].name}") \
-// ADMIN_USER=$(kubectl config view -o jsonpath="{.users[].name}") \
-// SA_NAME=$(kubectl -n kiosk get serviceaccount ${email} -o jsonpath="{.secrets[0].name}") \
-// SA_TOKEN=$(kubectl -n kiosk get secret $SA_NAME -o jsonpath="{.data.token}" | base64 -d) \
-// kubectl config set-credentials ${email} --token=$SA_TOKEN \
-// kubectl config set-context kiosk-user --cluster=$CLUSTER_NAME --user=${email} \
-// kubectl config use-context kiosk-user
-// }
-
-// removed serviceAccount
 module.exports = {
   kubectl,
   gcloud,

@@ -5,9 +5,8 @@ REQUIREMENTS:
 - Google Cloud SDK
 - vClusters
 - Helm
-- 
 
-INSTALL:gi
+INSTALL:
 - With NPM:
 
 TO GET STARTED:
@@ -108,3 +107,6 @@ Stage 2: get webpack dev server running
 Stage 3: fixing bug with serving bundle.js in production environment
   - Apparently you need to use app.use to catch the request sent in index.html for /bundle/build.js
   - need to investigate why app.get('/bundle/build) does not work.
+
+***
+This project is open-source and licensed under Apache 2.0, so you can use it in any private or commercial projects.

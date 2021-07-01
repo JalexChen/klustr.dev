@@ -60,7 +60,6 @@ const CreateUser = () => {
         <TextField label='First Name' name='firstName' onChange={handleFirstName}></TextField><br></br>
         <TextField label='Last Name' name='lastName' onChange={handleLastName}></TextField><br></br>
         <TextField label='Team Name' name='teamName' onChange={handleTeamName}></TextField><br></br>
-        {/* <Select>Select Team</Select> */}
         <FormControlLabel control={<Checkbox />} name='isAdmin' label='Add as Admin' labelPlacement='end'
           onChange={handleAdmin} value={isAdmin} /><br></br>
         <Button type='submit' label='Create User' variant="contained" color="primary">Create User</Button>
