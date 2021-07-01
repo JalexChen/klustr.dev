@@ -58,12 +58,8 @@ const ClusterContainer = () => {
         setNamespaces(namespaces)
     })
   }, [])
-<<<<<<< HEAD
-  
-=======
 
   const nameSpacesList = [];
->>>>>>> a327a63d9b35931e5ce1971034610d39d98d0d2d
   return (
     <div id='vClusterContainer'>
       <div className={classes.root}>

@@ -78,15 +78,6 @@ const CreateSpace = () => {
       },
       body: JSON.stringify(data)
     })
-<<<<<<< HEAD
-      .then(res => res.json())
-      .then(data => {
-        const ip = data.trim()
-            setExternalIp(ip);
-          })
-        setClickMe(`Click here to visit ${deploymentName}`);
-      }
-=======
     .then(res => res.json())
     .then(data => {
       const ip = data.trim()
@@ -94,7 +85,6 @@ const CreateSpace = () => {
         })
       setClickMe(`Click here to visit ${deploymentName}`);
   }
->>>>>>> a327a63d9b35931e5ce1971034610d39d98d0d2d
 
 
   return (

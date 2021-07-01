@@ -77,10 +77,6 @@ const App = (props) => {
     <div className="App">
       <Router>
         <AppContext.Provider value={value}>
-<<<<<<< HEAD
-          {navBar}
-          <MainContainer />
-=======
           {/* {navBar} */}
           {/* <Container 
           border="3px solid orange"
@@ -96,7 +92,6 @@ const App = (props) => {
             <ToggleTheme />
           {/* </Container> */}
           {/* </Container> */}
->>>>>>> a327a63d9b35931e5ce1971034610d39d98d0d2d
         </AppContext.Provider>
       </Router>
 
