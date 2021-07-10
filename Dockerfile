@@ -1,19 +1,12 @@
 # Set arguments
 ## Add gcloud service account here
 ARG gcloud_account=newadmin@klustr-316321.iam.gserviceaccount.com
-
-
 ## Add gcloud account key file path here
 ARG key_path=/secret/klustr-316321-f31f9767f260.json
-
 ## Add GKE project_id here
 ARG project_id=klustr-316321
-
-
 ## Add GKE Cluster zone here
 ARG cluster_zone=us-west1-a
-
-
 
 # ohana app image
 FROM node:latest AS app

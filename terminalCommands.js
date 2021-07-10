@@ -1,40 +1,18 @@
 const { exec } = require('child_process');
 const { hostname } = require('os');
 
+// executiion function for command line
 const runTerminalCommand = (command) => {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.warn(error);
-      }
-      resolve(stdout ? stdout : stderr);
-
+      (error) ? console.warn(error) : resolve(stdout ? stdout : stderr)
     })
-  })
-}
-
-// gcloud variables
-let clusterName = 'klustr-jefftest';
-let gcloudRegion = 'us-west1';
-let numNodes = '2';
-let gcloudUserEmail = 'contact.jeffchen@gmail.com';
-// kubctl variables
-let imageFile = 'docker.io/klustr/watchr'
-// imageFile only for watchr purposes
-let deploymentName = 'klustr-deployment'
-// changed to hostNameSpace instead of namespace
-let hostNamespace = 'kiosk';
-let configFile = '/yamlConfigs/account.yaml';
-let userConfigFile = '/yamlConfigs/userAccount.yaml';
-let podName = 'klustr-deployment-786bd87dd4-pvrk6';
-let userName = 'john';
-let portIn = '80';
-let portOut = '8080';
-let space = 'johns-space';
-let vClusterName = 'testing';
+  });
+};
 
 // gcloud terminal commands
 const gcloud = {}
+
 // necessary to create a cluster if it doesn't already exist; be aware of regional resource availability
 gcloud.create = (clusterName, numNodes, gcloudRegion) => `gcloud container clusters create ${clusterName} --num-nodes=${numNodes} --region=${gcloudRegion}`
 // 'gcloud container clusters get-credentials <insert name>:<optional tag> 
@@ -57,10 +35,10 @@ kubectl.describe = (hostNamespace) => `kubectl describe pods -n ${hostNamespace}
 kubectl.deployImage = (deploymentName, hostNamespace, imageFile) => `kubectl create deployment ${deploymentName} -n ${hostNamespace} --image=${imageFile}`
 // expose the deployment for kubernetes 
 kubectl.expose = (deploymentName, hostNamespace) => `kubectl expose deployment ${deploymentName} -n ${hostNamespace} --type LoadBalancer --port=80 --target-port=8080`
-// deploy the pod in a specific namespace with the image configuration
-kubectl.deploy = (hostNamespace, configFile) => `kubectl apply -n ${hostNamespace} -f /Users/fenris/Desktop/Codesmith/klustr.dev/yamlConfigs/${configFile}.yaml`
 // deploy the pod in a specific namespace with the image configuration impersonating a user; admin only
 kubectl.deployAs = (hostNamespace, configFile, userName) => `kubectl apply -n ${hostNamespace} -f /yamlConfigs/${configFile}.yaml --as=${userName}`
+// grabs the external exposed IP address
+kubectl.exposedIP = (deploymentName, deployedNamespace) => `kubectl get services ${deploymentName} -n ${deployedNamespace} -o jsonpath="{.status.loadBalancer.ingress[0].ip}"`
 
 const vCluster = {}
 
@@ -69,31 +47,9 @@ vCluster.connect = (vClusterName, hostNamespace) => `vcluster connect ${vCluster
 vCluster.delete = (vClusterName, hostNamespace) => `vcluster delete ${vClusterName} -n ${hostNamespace}`;
 
 
-const serviceAccount = {}
-
-serviceAccount.user = (email) => `USER_NAME=${email} \ kubectl -n kiosk create serviceaccount $USER_NAME`
-serviceAccount.userConfig = (email) => {
-  `USER_NAME=${email} \ KUBECONFIG_PATH="$HOME/.kube/config-kiosk" \ kubectl config view --minify --raw >$KUBECONFIG_PATH
-export KUBECONFIG=$KUBECONFIG_PATH \ 
-CURRENT_CONTEXT=$(kubectl config current-context) \
-kubectl config rename-context $CURRENT_CONTEXT kiosk-admin \
-CLUSTER_NAME=$(kubectl config view -o jsonpath="{.clusters[].name}") \
-ADMIN_USER=$(kubectl config view -o jsonpath="{.users[].name}") \
-SA_NAME=$(kubectl -n kiosk get serviceaccount ${email} -o jsonpath="{.secrets[0].name}") \
-SA_TOKEN=$(kubectl -n kiosk get secret $SA_NAME -o jsonpath="{.data.token}" | base64 -d) \
-kubectl config set-credentials ${email} --token=$SA_TOKEN \
-kubectl config set-context kiosk-user --cluster=$CLUSTER_NAME --user=${email} \
-kubectl config use-context kiosk-user`
-}
-// set cluster name = to cluster id or team id?
-// admin user??
-// SA token = JWT or we are using dex?
-
-
 module.exports = {
   kubectl,
   gcloud,
   vCluster,
-  serviceAccount,
   runTerminalCommand,
 }

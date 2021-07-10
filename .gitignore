@@ -1,3 +1,5 @@
 node_modules
 package-lock.json
 klustr-316321-f31f9767f260.json
+Dockerfile
+docker-compose.yml
