@@ -53,27 +53,30 @@ const CreateCluster = () => {
     setHostNamespace(e.target.value);
   };
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     const data = { clusterName, vClusterName, hostNamespace };
     setCurrentProcess(<span>Creating {vClusterName}</span>);
     setInProgress(<CircularProgress />);
     e.preventDefault();
-
-    fetch("/vclusters/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setCurrentProcess(data);
-        setInProgress("");
+    try {
+      let response = await fetch("/vclusters/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       })
-      .catch((err) => console.log(err));
-  };
+      response = await response.json();
+      setCurrentProcess(response);
+      setInProgress('')
+    }
+      catch(err) {
+        console.log(err)
+      } 
+    };
 
+  // will need to edit the CSS as well to live in another document;
+  // create different components containers for the boxes? seems like a lot here;
   return (
     <div id="create-clusters">
       <div className={classes.root}>

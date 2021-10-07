@@ -10,25 +10,11 @@ const AdminPage = async () => {
 
   // need to put this in an env variable
   const cookiePath = "/cookies"
-  const clustList = "/clusters/list"
+  const clusterList = "/clusters/list"
 
   useEffect(() => {
-    fetchCookiesData(cookiePath, [setIsLoggedIn, setIsAdmin] )
-    const fetchCookieData = async () => {
-      let response = await fetch("/cookies")
-      response = response.json();
-      setIsLoggedIn(response.isLoggedIn)
-      setIsAdmin(response.isAdmin)
-    }
-    fetchCookieData()
-    const fetchClusterList = async () => {
-      let response = await fetch("/clusters/list")
-      response = response.json();
-      let names = [];
-      response.forEach((element) => names.push(element.name))
-      setClusterNames(names);
-    }
-    fetchClusterList();
+    fetchCookieData(cookiePath, setIsLoggedIn, setIsAdmin)
+    fetchClusterList(clusterList, setClusterNames)
   },[])
 
   return (
