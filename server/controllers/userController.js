@@ -3,10 +3,8 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 const { runTerminalCommand } = require('../../terminalCommands');
+const { query } = require('express');
 const secret = 'ohana';
-
-let configFile = '/yamlConfigs/userAccount.yaml';
-let viewConfigFile = '/yamlConfigs/viewUserAccount.yaml';
 
 const userController = {};
 
@@ -22,8 +20,9 @@ const userController = {};
 // }
 
 userController.bcryptPassword = (req, res, next) => {
+  // console.log('req.body', req.body);
   const { password } = req.body;
-  console.log('hitting bcrypt controller', password)
+  // console.log('hitting bcrypt controller', password)
   bcrypt.hash(password, saltRounds)
     .then((hash) => {
       res.locals.password = hash;
@@ -34,11 +33,9 @@ userController.bcryptPassword = (req, res, next) => {
 
 userController.teamIdLookup = (req, res, next) => {
   const { teamName } = req.body;
-  // look up the team id value stored
   const query = `SELECT _id FROM teams WHERE name='${teamName}'`;
   db.query(query)
     .then((data) => {
-      console.log(data.rows[0]._id)
       res.locals.teamId = data.rows[0]._id;
       return next();
     })
@@ -49,9 +46,8 @@ userController.teamIdLookup = (req, res, next) => {
       })
     })
 }
-
 userController.addNewUser = (req, res, next) => {
-  console.log('hitting addNewUser controller')
+  // console.log('hitting addNewUser controller')
   const { teamId, password } = res.locals;
   const { email, firstName, lastName, isAdmin } = req.body;
   const params = [email, password, firstName, lastName, isAdmin, teamId];
@@ -64,91 +60,6 @@ userController.addNewUser = (req, res, next) => {
       return next({ log: `Error in userController.addNewUser: ${err}` });
     })
 }
-
-// userController.editUser 
-userController.editAccessUser = (req, res, next) => {
-  console.log('hitting editAccess controller')
-  const { editAccess } = req.body;
-  console.log('Checking if true', editAccess);
-
-  if (editAccess === true) {
-    console.log('running terminal command')
-    runTerminalCommand(kubectl.createFromConfig(configFile))
-      .then(() => next())
-      .catch((err) => {
-        return next({ log: `Error in userController.editAccessUser: ${err}` });
-      })
-  }
-}
-// userController.addNewUser = (req, res, next) => {
-//   const { password } = res.locals;
-//   const { email, firstName, lastName, teamId, isAdmin, editAccess } = req.body;
-//   const params = [email, password, firstName, lastName, isAdmin, teamId, editAccess];
-//   const query = `
-//   INSERT INTO users(email, password, first_name, last_name, is_admin, team_id, edit_access)
-//   VALUES ($1, $2, $3, $4, $5, $6, $7);`
-//   db.query(query, params)
-//     .then(() => next())
-//     .catch((err) => {
-//       return next({ log: `Error in userController.addNewUser: ${err}` });
-//     })
-// }
-
-// new || do we need to add this into the db as well?
-userController.createServiceAccount = (req, res, next) => {
-  const { email } = req.body
-  // run terminal command for service account
-  runTerminalCommand(serviceAccount.user(email))
-    .then((data) => {
-      console.log('what is data', data)
-      runTerminalCommand(serviceAccount.userConfig(email))
-      return next();
-    })
-    .catch((err) => {
-      return next({ log: `Error in userController.createServiceAccount: ${err}` });
-    })
-}
-
-// create tenancy with the useraccount.yaml
-// userController.createTenancy = (req, res, next) => {
-//   const { email } = req.body
-//   // need to generate a yaml file here
-//   // const accountConfigFile = generateYaml with email
-//   // const spaceConfigFile = generateYaml with email
-//   runTerminalCommand(kubectl.createFromConfigAs(configFile, email))
-//   .then((data) => {
-//     console.log('what is data', data)
-//     runTerminalCommand(kubectl.createFromConfigAs(configFile, email))
-//     return next();
-//   })
-//   .catch((err) => {
-//     return next({log: `Error in userController.createTenancy: ${err}`})
-//   })
-// }
-
-// this is new do not delete
-// userController.editAccessUser = (req, res, next) => {
-//   const { editAccess } = req.body
-//   runTerminalCommand(kubectl.currentContext())
-//   .then((data) => {
-//     const clusterName = data.split('_').slice(-1).toString().trim();
-//     runTerminalCommand(gcloud.getCredentials(clusterName))
-//   .then((data) => {
-//     if (editAccess === 'true') {
-//       // need to create config files automatically
-//       runTerminalCommand(kubectl.createFromConfig(configFile))
-//       return next();
-//     } else {
-//       runTerminalCommand(kubectl.createFromConfig(configFile))
-//       return next();
-//     }
-//   })
-//   .catch((err) => {
-//     return next({ log: `Error in userController.editAccessUser: ${err}` });
-//     })
-//   })
-// }
-
 userController.loginCheck = (req, res, next) => {
   const { email, password } = req.body;
   const query = `
@@ -158,7 +69,7 @@ userController.loginCheck = (req, res, next) => {
   db.query(query)
     .then((result) => {
       if (!result.rows.length) {
-        console.log('user does not exist')
+        // console.log('user does not exist')
         res.locals.user = false
         return next({ log: 'Incorrect username/password', message: 'Incorrect username/password' });
       }
@@ -175,23 +86,44 @@ userController.isAdminCheck = (req, res, next) => {
   const { email } = req.body;
   const params = [email];
   const query = `
-  SELECT is_admin
+  SELECT is_admin, first_name, last_name
   FROM users
   WHERE email=$1;
   `
   db.query(query, params)
     .then(result => {
-      let isAdminResult = result.rows[0].is_admin;
+      const firstName = result.rows[0].first_name
+      const lastName = result.rows[0].last_name
+      const isAdminResult = result.rows[0].is_admin;
       if (!isAdminResult) isAdminResult = false;
       res.locals.isAdminResult = isAdminResult;
-      return next();
+      res.locals.firstName = firstName;
+      res.locals.lastName = lastName;
+      return next();  
     }).catch(err => next({ log: `Error in userController.isAdminCheck: ${err}` }))
 }
 
+
+userController.teamId = (req, res, next) => {
+  const { email } = req.body;
+  const params = [email];
+  const query = `
+  SELECT team_id
+  FROM users
+  WHERE email=$1;
+  `
+  db.query(query, params)
+    .then(result => {
+      let teamId = result.rows[0].team_id;
+      res.locals.teamId = teamId;
+      return next();
+    }).catch(err => next({ log: `Error in userController.teamId: ${err}` }))
+}
+
 userController.assignJwt = (req, res, next) => {
-  const { isAdminResult } = res.locals;
-  const { email, firstName, lastName } = req.body;
-  jwt.sign({ email, firstName, lastName, isAdmin: isAdminResult }, secret, (err, token) => {
+  const { isAdminResult, teamId, firstName, lastName } = res.locals;
+  const { email } = req.body;
+  jwt.sign({ email, teamId, isAdmin: isAdminResult, firstName, lastName }, secret, (err, token) => {
     if (err) return next({ log: `Error in userController.assignJwt: ${err}` })
     res.locals.token = token;
     return next();
@@ -202,7 +134,10 @@ userController.verifyAdmin = (req, res, next) => {
   const { AuthToken } = req.cookies;
   jwt.verify(AuthToken, secret, (err, decoded) => {
     if (err) return next({ log: `Error in userController.verifyAdmin: ${err}` });
+    res.locals.firstName = decoded.firstName;
+    res.locals.lastName = decoded.lastName;
     res.locals.isAdmin = decoded.isAdmin;
+    res.locals.teamId = decoded.teamId;
     return next();
   })
 }
