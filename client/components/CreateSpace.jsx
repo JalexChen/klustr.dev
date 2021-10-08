@@ -65,20 +65,24 @@ const CreateSpace = () => {
       .catch((err) => console.log(err));
   };
 
-  const deployButton = (e) => {
+  const deployButton = async (e) => {
     const data = { deploymentName, deployHostNamespace, imageFile };
     e.preventDefault();
-    fetch("/spaces/deploy", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.log(err));
-  };
+    try {
+      let response = await fetch("/spaces/deploy", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+        response = await response.json()
+        console.log(await response);
+      }
+      catch(err) {
+        console.log(err);
+      }
+    }
 
   const getIp = (e) => {
     e.preventDefault();

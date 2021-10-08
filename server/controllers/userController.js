@@ -69,7 +69,7 @@ userController.loginCheck = (req, res, next) => {
   db.query(query)
     .then((result) => {
       if (!result.rows.length) {
-        // console.log('user does not exist')
+        console.log('user does not exist')
         res.locals.user = false
         return next({ log: 'Incorrect username/password', message: 'Incorrect username/password' });
       }

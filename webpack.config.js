@@ -32,7 +32,7 @@ module.exports = {
     ],
   },
   devServer: {
-    host: '0.0.0.0',
+    // host: '0.0.0.0',
     publicPath: '/build/',
     port: 8080,
     proxy: {
